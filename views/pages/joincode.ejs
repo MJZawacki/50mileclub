@@ -1,0 +1,40 @@
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+</head>
+<body class="container">
+
+<header>
+    <% include ../partials/header %>
+</header>
+
+<main>
+    <div class="jumbotron">
+
+        <% if (!user) { %>
+          <h2>Welcome! Please log in.</h2>
+        <% } else { %>
+          <form action="/submitcode" method="post">
+
+            <div class="form-group">
+              <label for="invitecode">Invite Code:</label>
+              <input type="text" class="form-control" id="invitecode" name="invitecode">
+            </div>
+            <button type="submit" class="btn btn-default">Submit</button>
+          </form>
+
+        <% } %>
+        
+    </div>
+</main>
+
+<footer>
+    <% include ../partials/footer %>
+</footer>
+
+</body>
+</html>
+

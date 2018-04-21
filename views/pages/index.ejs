@@ -1,0 +1,66 @@
+<!-- views/pages/index.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <% include ../partials/head %>
+    
+</head>
+<body class="container">
+
+<header>
+    <% include ../partials/header %>
+</header>
+
+<main>
+    <div class="jumbotron">
+
+        <% if (!user) { %>
+          <h2>Welcome to the 50 mile club! Please log in.</h2>
+        <% } else { %>
+          <h2>Hello, <%= user.displayName %>.</h2>
+          <h3>Your weekly mileage: </h3>
+          <% if ((stravadata !== undefined) && (stravadata != null)) { %>
+            <h4>Bike Rides <span class="label label-default"><%= stravadata.numactivities %></span></h4>
+            <h4>Total Mileage <span class="label label-default"><%= stravadata.distance %></span></h4>
+            <% } %>
+
+        <% } %>
+        
+    </div>
+
+    <!-- .active	Applies the hover color to the table row or table cell
+    .success	Indicates a successful or positive action
+    .info	Indicates a neutral informative change or action
+    .warning	Indicates a warning that might need attention
+    .danger -->
+    <% if (stats) { %>
+
+    
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                <th>Name</th><th>Distance</th><th>Road</th><th>Trainer</th>
+                </tr>
+            
+                <% for (var i = 0; i < stats.length; i++) { %>
+                <tr>
+                <td><%= stats[i].name %></td>
+                <td><%= stats[i].distance %></td>
+                <td><%= stats[i].roadrides %></td>
+                <td><%= stats[i].trainerrides %></td>
+                </tr>    
+                <% } %>
+            </table>
+        </div>
+
+     <% } %>
+</main>
+
+<footer>
+    <% include ../partials/footer %>
+</footer>
+
+</body>
+</html>
+

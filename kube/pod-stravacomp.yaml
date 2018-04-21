@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: stravacomp
+  labels:
+    app: stravacomp
+spec:
+  containers:
+  - name: stravacomp
+    image: mzacr.azurecr.io/stravacomp
+    ports:
+    - containerPort: 3000

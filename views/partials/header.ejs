@@ -1,0 +1,26 @@
+<!-- views/partials/header.ejs -->
+
+<nav class="navbar navbar-default" role="navigation">
+    <div class="container-fluid">
+    
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#">
+                <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
+                50 Miles
+            </a>
+    
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <% if (!user) { %>
+                    <li><a href="/login/?p=B2C_1_SignIn">Sign In</a></li>
+                <% } else { %>
+                    <li><a href="/account">Account</a></li>
+                    <li><a href="/login/?p=B2C_1_updateprofile">Profile</a></li>
+                    <li><a href="/login/?p=B2C_1_resetpassword">Reset Password</a></li>
+                    <li><a href="/logout">Log Out</a></li>
+                <% } %>
+            </ul>
+        </div>
+    
+    </div>
+    </nav>

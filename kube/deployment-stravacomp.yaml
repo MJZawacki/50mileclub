@@ -1,0 +1,98 @@
+
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: strava-deployment
+spec:
+  selector:
+    matchLabels:
+      app: stravacomp
+  replicas: 1 # tells deployment to run 2 pods matching the template
+  template: # create pods using pod definition in this template
+    metadata:
+      # unlike pod-nginx.yaml, the name is not included in the meta data as a unique name is
+      # generated from the deployment name
+      labels:
+        app: stravacomp
+    spec:
+      terminationGracePeriodSeconds: 30
+      containers:
+      - name: stravacomp
+        image: mzacr.azurecr.io/stravacomp:0.74
+        ports:
+        - containerPort: 3000
+        env:
+        - name: AD_DIR_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: AD_DIR_NAME
+        - name: PUBLIC_HOST_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: PUBLIC_HOST_NAME
+        - name: CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: CLIENT_ID
+        - name: CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: CLIENT_SECRET
+        - name: SIGNUP_PROFILE
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: SIGNUP_PROFILE
+        - name: MONGO_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: MONGO_HOST
+        - name: MONGO_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: MONGO_PORT
+        - name: MONGO_PARAMS
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: MONGO_PARAMS
+        envFrom:
+        - configMapRef:
+            name: strava-config
+        livenessProbe:
+          # an http probe
+          httpGet:
+            path: /_status/healthz
+            port: 3000
+            # length of time to wait for a pod to initialize
+            # after pod startup, before applying health checking
+          initialDelaySeconds: 30
+          timeoutSeconds: 1
+        imagePullPolicy: "Always"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: nginx-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    ingress.kubernetes.io/ssl-redirect: “true”
+spec:
+  tls:
+  - hosts:
+    - www.50mile.club
+    secretName: tls-secret
+  rules:
+  - host: www.50mile.club
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: stravacomp-service
+          servicePort: 80
