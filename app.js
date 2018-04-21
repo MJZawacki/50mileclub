@@ -173,7 +173,7 @@ app.use(bodyParser.urlencoded({ extended : true }));
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(app.router);
-app.use(express.static(__dirname + '/../../public'));
+app.use(express.static('public'));
 
 //-----------------------------------------------------------------------------
 // Set up the route controller
@@ -299,6 +299,9 @@ app.get('/dashboard', ensureAuthenticated, function(req, res) {
   
 });
 
+app.get('/about', function (req, res) {
+  res.render('pages/about');
+})
 // '/account' is only available to logged in user
 app.get('/account', ensureAuthenticated, function(req, res) {
   res.render('pages/account', { user: req.user });

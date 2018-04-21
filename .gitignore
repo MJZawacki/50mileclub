@@ -30,3 +30,4 @@ node_modules
 config.js
 data
 kube/secret.yaml
+build.ps1
