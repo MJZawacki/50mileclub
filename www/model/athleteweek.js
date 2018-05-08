@@ -5,9 +5,10 @@ var athleteWeekSchema = new mongoose.Schema({
     AthleteID: String,
     TotalDistance: Number,
     IndoorRides: Number,
+    CompID: {type: Schema.ObjectId, ref: 'Competition'},
+    WeekNum: Number,
     OutdoorRides: Number,
-    Week: {type: Schema.ObjectId, ref: 'Week'},
-    Activities: [String]
+    Activities: [Number] // activity id's
    });
   
 var AthleteWeek = module.exports = mongoose.model('AthleteWeek', athleteWeekSchema);

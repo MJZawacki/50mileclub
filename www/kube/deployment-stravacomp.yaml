@@ -96,3 +96,18 @@ spec:
         backend:
           serviceName: stravacomp-service
           servicePort: 80
+---
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: stravadatapull
+spec:
+  schedule: "*/1 * * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: stravadatapull
+            image: mzacr.azurecr.io/stravaupdate:0.74
+          restartPolicy: OnFailure

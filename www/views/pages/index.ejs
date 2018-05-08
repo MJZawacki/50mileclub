@@ -34,21 +34,21 @@
     .info	Indicates a neutral informative change or action
     .warning	Indicates a warning that might need attention
     .danger -->
-    <% if (stats) { %>
+    <% if (mystats) { %>
 
     
         <div class="table-responsive">
             <table class="table">
                 <tr>
-                <th>Name</th><th>Distance</th><th>Road</th><th>Trainer</th>
+                <th>Week</th><th>Distance</th><th>Road</th><th>Trainer</th>
                 </tr>
             
-                <% for (var i = 0; i < stats.length; i++) { %>
+                <% for (var i = 0; i < mystats.length; i++) { %>
                 <tr>
-                <td><%= stats[i].name %></td>
-                <td><%= stats[i].distance %></td>
-                <td><%= stats[i].roadrides %></td>
-                <td><%= stats[i].trainerrides %></td>
+                <td><%= mystats[i].weeknum %></td>
+                <td><%= mystats[i].distance %></td>
+                <td><%= mystats[i].roadrides %></td>
+                <td><%= mystats[i].trainerrides %></td>
                 </tr>    
                 <% } %>
             </table>
