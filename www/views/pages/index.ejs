@@ -13,21 +13,22 @@
 </header>
 
 <main>
-    <div class="jumbotron">
 
         <% if (!user) { %>
+    <div class="jumbotron">
           <h2>Welcome to the 50 mile club! Please log in.</h2>
-        <% } else { %>
-          <h2>Hello, <%= user.displayName %>.</h2>
-
-
-        <% } %>
-        
     </div>
+        <% } else { %>
+      
 
-       <% if (competitorStats) { %>
 
     
+        
+
+    <div class="container-fluid">
+       <% if (competitorStats) { %>
+
+    <div class="row">
         <h2>Week <%= weeknum %> Stats</h2>
         <div class="table-responsive">
             <table class="table">
@@ -45,7 +46,7 @@
                 <% } %>
             </table>
         </div>
-
+    </div>
      <% } %>
 
 
@@ -55,27 +56,28 @@
     .warning	Indicates a warning that might need attention
     .danger -->
     <% if (mystats) { %>
-
-    <h2>Previous Weeks</h2>
-        <div class="table-responsive">
-            <table class="table">
-                <tr>
-                <th>Week</th><th>Distance</th><th>Road</th><th>Trainer</th>
-                </tr>
-            
-                <% for (var i = 1; i < mystats.length; i++) { %>
-                <tr>
-                <td><%= mystats[i].weeknum %></td>
-                <td><%= mystats[i].distance %></td>
-                <td><%= mystats[i].roadrides %></td>
-                <td><%= mystats[i].trainerrides %></td>
-                </tr>    
-                <% } %>
-            </table>
-        </div>
-
+<div class="row">
+        <h2>Previous Weeks</h2>
+            <div class="table-responsive">
+                <table class="table">
+                    <tr>
+                    <th>Week</th><th>Distance</th><th>Road</th><th>Trainer</th>
+                    </tr>
+                
+                    <% for (var i = 1; i < mystats.length; i++) { %>
+                    <tr>
+                    <td><%= mystats[i].weeknum %></td>
+                    <td><%= mystats[i].distance %></td>
+                    <td><%= mystats[i].roadrides %></td>
+                    <td><%= mystats[i].trainerrides %></td>
+                    </tr>    
+                    <% } %>
+                </table>
+            </div>
+    </div>
      <% } %>
-
+    <% } %>
+</div>
 
 </main>
 

@@ -1,27 +1,45 @@
 <!-- views/partials/header.ejs -->
 
-<nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">
+    <img class="icon" src="/images/noun_49402_cc.svg" />
+    50 Mile Club
+</a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item active">
+        <a class="nav-link" href="/">Home<span class="sr-only">(current)</span></a>
+      </li>
+       <% if (!user) { %>
+            <li class="nav-item">
+                <a class="nav-link" href="/login/?p=B2C_1_SignIn">Sign In</a>
+            </li>
     
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">
-                <img class="icon" src="/images/noun_49402_cc.svg" />
-                50 Mile Club
-            </a>
-    
-            <ul class="nav navbar-nav">
-                <li><a href="/">Home</a></li>
-                <% if (!user) { %>
-                    <li><a href="/login/?p=B2C_1_SignIn">Sign In</a></li>
-                <% } else { %>
-                    <li><a href="/account">Account</a></li>
-                    <li><a href="/login/?p=B2C_1_updateprofile">Profile</a></li>
-                    <li><a href="/login/?p=B2C_1_resetpassword">Reset Password</a></li>
-                    <li><a href="/about">About</a></li>
-                    <li><a href="/logout">Log Out</a></li>
-                <% } %>
-            </ul>
-        </div>
-    
-    </div>
-    </nav>
+        <% } else { %>
+        </ul>
+        <ul class="navbar-nav">
+                <li class="nav-item dropdown ">
+                    
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <%= user.displayName %>
+                        </a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            <a class="dropdown-item" href="/account">Account</a>
+                            <a class="dropdown-item" href="/login/?p=B2C_1_updateprofile">Profile</a>
+                            <a class="dropdown-item" href="/login/?p=B2C_1_resetpassword">Reset Password</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="/logout">Log Out</a>
+                        </div>
+                  
+                </li>
+                
+        <% } %>
+
+    </ul>     
+
+  </div>
+</nav>
