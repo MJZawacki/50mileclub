@@ -19,15 +19,35 @@
           <h2>Welcome to the 50 mile club! Please log in.</h2>
         <% } else { %>
           <h2>Hello, <%= user.displayName %>.</h2>
-          <h3>Your weekly mileage: </h3>
-          <% if ((stravadata !== undefined) && (stravadata != null)) { %>
-            <h4>Bike Rides <span class="label label-default"><%= stravadata.numactivities %></span></h4>
-            <h4>Total Mileage <span class="label label-default"><%= stravadata.distance %></span></h4>
-            <% } %>
+
 
         <% } %>
         
     </div>
+
+       <% if (competitorStats) { %>
+
+    
+        <h2>Week <%= weeknum %> Stats</h2>
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                <th>Athlete</th><th>Distance</th><th>Road</th><th>Trainer</th>
+                </tr>
+            
+                <% for (var i = 0; i < competitorStats.length; i++) { %>
+                <tr>
+                <td><%= competitorStats[i].AthleteName %></td>
+                <td><%= competitorStats[i].distance %></td>
+                <td><%= competitorStats[i].outdoorrides %></td>
+                <td><%= competitorStats[i].trainerrides %></td>
+                </tr>    
+                <% } %>
+            </table>
+        </div>
+
+     <% } %>
+
 
     <!-- .active	Applies the hover color to the table row or table cell
     .success	Indicates a successful or positive action
@@ -36,7 +56,7 @@
     .danger -->
     <% if (mystats) { %>
 
-    
+    <h2>Your Stats</h2>
         <div class="table-responsive">
             <table class="table">
                 <tr>
@@ -55,6 +75,8 @@
         </div>
 
      <% } %>
+
+
 </main>
 
 <footer>

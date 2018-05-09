@@ -62,6 +62,26 @@ spec:
             configMapKeyRef:
               name: strava-config
               key: MONGO_PARAMS
+        - name: STRAVA_ACCESS_TOKEN
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: STRAVA_ACCESS_TOKEN
+        - name: STRAVA_CLIENT_ID
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: STRAVA_CLIENT_ID
+        - name: STRAVA_CLIENT_SECRET
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: STRAVA_CLIENT_SECRET
+        - name: STRAVA_REDIRECT_URI
+          valueFrom:
+            configMapKeyRef:
+              name: strava-config
+              key: STRAVA_REDIRECT_URI
         envFrom:
         - configMapRef:
             name: strava-config
@@ -75,6 +95,23 @@ spec:
           initialDelaySeconds: 30
           timeoutSeconds: 1
         imagePullPolicy: "Always"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: stravacomp-service
+spec:
+  ports:
+  - protocol: TCP
+    targetPort: 3000
+    port: 80 # the port that this service should serve on
+    # the container on each pod to connect to, can be a name
+    # (e.g. 'www') or a number (e.g. 80)
+  # just like the selector in the deployment,
+  # but this time it identifies the set of pods to load balance
+  # traffic to.
+  selector:
+    app: stravacomp
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -102,7 +139,7 @@ kind: CronJob
 metadata:
   name: stravadatapull
 spec:
-  schedule: "*/1 * * * *"
+  schedule: "*/30 * * * *"
   jobTemplate:
     spec:
       template:

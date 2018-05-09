@@ -52,6 +52,7 @@ var log = bunyan.createLogger({
 });
 
 
+
 // query for users in comp
 Competition.
   findOne({ InviteCode: id }).
@@ -116,6 +117,7 @@ Competition.
           return Promise.all(weekpromises)
         }).then((result) => {
           console.log("end of participant " + current_user.AthleteID);
+          // Update 
           return;
         }).catch((err) => {
           console.log(err)

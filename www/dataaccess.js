@@ -43,6 +43,15 @@ exports.getUserAccessCodes = function (userids, callback) {
 
 }
 
+
+
+exports.getthisweeknum = function(comp) {
+    let startdate = comp.StartDate;
+    let today = Date.now();
+    let completedweeks = Math.floor(Math.abs(today - startdate) / (1000 * 60 * 60 * 24 * 7));
+    return completedweeks + 1;
+}
+
 exports.getCompByInvite = function (invitecode, callback) {
 
     Competition.findOne({ InviteCode: invitecode }, function (err, comps) {
@@ -79,6 +88,32 @@ var getweek = function (starttime, weeknum = 1) {
     var StartDate = new Date(startofWeek);
     var EndDate = new Date(startofWeek.setDate(startofWeek.getDate() + 7));
     return [StartDate.getTime() / 1000, EndDate.getTime() / 1000];
+}
+
+exports.getLatestCompStats = function (comp) {
+    var stats = [];
+    var promises = [];
+  
+    return comp.populate('Participants').execPopulate().then((comp) => {
+        return comp.Participants
+    }).each((thisuser, index) => {
+            return exports.getStats(comp, thisuser, exports.getthisweeknum(comp)).then((stat) =>
+            {
+              stats.push(stat[0]);  
+            });
+    }).then(participants => {
+        return stats;
+    });
+}
+
+exports.getStats = function(comp, user, weeknum) {
+    if (weeknum == null) {
+        return AthleteWeek.find({ AthleteID: user.AthleteID }).sort('-WeekNum').exec();
+        
+    } else {
+
+        return AthleteWeek.where({ AthleteID: user.AthleteID, WeekNum: weeknum}).exec();
+    }
 }
 
 exports.getStravaCompData = function (access_token, user, start_date, weeknum) {

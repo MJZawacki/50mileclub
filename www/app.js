@@ -200,6 +200,8 @@ app.get('/', function (req, res) {
   log.debug("ThisUser:" + req.session.thisuser);
   log.debug("User: " + req.user);
   log.debug("access_token: " + req.session.access_token)
+  var mystats = [];
+
   if ((req.user != null) && (req.session.access_token != null)) {
     // get strava data
     var access_token = req.session.access_token;
@@ -217,10 +219,9 @@ app.get('/', function (req, res) {
       return AthleteWeek.find({ AthleteID: thisuser.AthleteID }).sort('-WeekNum');
     }).
       then(function (totaldata) {
-        var mystats = [];
+        
           // are they up to date? if not call function to fill out
           for (var i = 0; i < totaldata.length; i++) {
-        
               mystats.push({
                 name: totaldata[i].AthleteName,
                 weeknum: totaldata[i].WeekNum,
@@ -232,20 +233,39 @@ app.get('/', function (req, res) {
           }
           return mystats;
     }).then((mystats) => {
-      res.render('pages/index',
-        {
-          mystats: mystats,
-          user: req.user,
-          stravadata: {
-            distance: parseFloat(Math.round(thisweeksdata.TotalDistance * 100) / 100).toFixed(2),
-            numactivities: thisweeksdata.Activities.length,
-            trainerrides: thisweeksdata.IndoorRides,
-            outdoorrides: thisweeksdata.OutdoorRides
-          }
-
-        });
-
+      var modeluser = new User(thisuser);
+      return modeluser.populate('Competition').execPopulate().then((user) => {
+        return dataaccess.getLatestCompStats(user.Competition);
       });
+    }).then((compstats) => {
+      var competitorStats = [];
+      for (var i=0; i< compstats.length; i++){
+        competitorStats.push(
+          {
+            AthleteID: compstats[i].AthleteID,
+            AthleteName: compstats[i].AthleteName,
+            distance: parseFloat(Math.round(compstats[i].TotalDistance * 100) / 100).toFixed(2),
+            trainerrides: compstats[i].IndoorRides,
+            outdoorrides: compstats[i].OutdoorRides
+          });
+      }
+        
+        res.render('pages/index',
+          {
+            competitorStats: competitorStats,
+            mystats: mystats,
+            weeknum: mystats[0].weeknum,
+            user: req.user,
+            stravadata: {
+              distance: parseFloat(Math.round(thisweeksdata.TotalDistance * 100) / 100).toFixed(2),
+              numactivities: thisweeksdata.Activities.length,
+              trainerrides: thisweeksdata.IndoorRides,
+              outdoorrides: thisweeksdata.OutdoorRides
+            }
+  
+          });
+      });
+
 
 
   } else {
