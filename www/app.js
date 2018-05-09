@@ -235,7 +235,11 @@ app.get('/', function (req, res) {
     }).then((mystats) => {
       var modeluser = new User(thisuser);
       return modeluser.populate('Competition').execPopulate().then((user) => {
-        return dataaccess.getLatestCompStats(user.Competition);
+        if (user.Competition) {
+          return dataaccess.getLatestCompStats(user.Competition);
+        } else {
+          return [];
+        }
       });
     }).then((compstats) => {
       var competitorStats = [];
@@ -249,12 +253,15 @@ app.get('/', function (req, res) {
             outdoorrides: compstats[i].OutdoorRides
           });
       }
-        
+        var currentweek = 0;
+        if (mystats[0]) {
+          currentweek = mystats[0].weeknum;
+        }
         res.render('pages/index',
           {
             competitorStats: competitorStats,
             mystats: mystats,
-            weeknum: mystats[0].weeknum,
+            weeknum: currentweek,
             user: req.user,
             stravadata: {
               distance: parseFloat(Math.round(thisweeksdata.TotalDistance * 100) / 100).toFixed(2),
@@ -350,7 +357,6 @@ app.get('/connectstrava', ensureAuthenticated, function (req, res) {
         DisplayName: req.user.displayName,
         City: req.user._json.city,
         State: req.user._json.state,
-        OID: req.user.oid,
         CurrentComp: null,
         StravaAccessCode: access_token,
         AthleteID: authpayload.athlete.id,
@@ -359,12 +365,17 @@ app.get('/connectstrava', ensureAuthenticated, function (req, res) {
 
       }
       var query = { 'OID': req.user.oid };
-      User.findOneAndUpdate(query, updatedUser, { upsert: true }, function (err, doc) {
-        if (err) return res.send(500, { error: err });
-        req.session.thisuser = updatedUser;
-        req.session.save((err) => {
-          res.redirect('/');
-        })
+      User.findOneAndUpdate(query, updatedUser, { upsert: true, new: true }).exec().then(doc => {
+        
+        req.session.thisuser = doc;
+        req.session.save();
+        // update comp data
+        doc.populate('Competition').execPopulate().then(doc => {
+          var compid = doc.Competition.InviteCode;
+          return dataaccess.updateAllCompData(compid).then(() => {
+            res.redirect('/');
+          });
+        });;
       });
     });
   }
