@@ -269,7 +269,7 @@ app.get('/', function (req, res) {
 
 
   } else {
-    res.render('pages/index', { user: req.user, stravadata: { distance: 'n/a/' }, mystats: null });
+    res.render('pages/index', { user: req.user, stravadata: { distance: 'n/a/' }, mystats: null, competitorStats: null, weeknum: null });
   }
 
 });

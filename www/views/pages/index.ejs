@@ -56,14 +56,14 @@
     .danger -->
     <% if (mystats) { %>
 
-    <h2>Your Stats</h2>
+    <h2>Previous Weeks</h2>
         <div class="table-responsive">
             <table class="table">
                 <tr>
                 <th>Week</th><th>Distance</th><th>Road</th><th>Trainer</th>
                 </tr>
             
-                <% for (var i = 0; i < mystats.length; i++) { %>
+                <% for (var i = 1; i < mystats.length; i++) { %>
                 <tr>
                 <td><%= mystats[i].weeknum %></td>
                 <td><%= mystats[i].distance %></td>
