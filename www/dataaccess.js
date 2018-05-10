@@ -119,6 +119,7 @@ exports.getStats = function(comp, user, weeknum) {
 }
 
 exports.getStravaCompData = function (access_token, user, start_date, weeknum) {
+    console.log(user.AthleteName);
     var data = null;
     if (start_date == null) {
         start_date = Date.now();
@@ -133,7 +134,7 @@ exports.getStravaCompData = function (access_token, user, start_date, weeknum) {
         url: 'https://www.strava.com/api/v3/athlete/activities',
         qs: { page:'1', before: week[1], after: week[0] },
     headers: 
-    { Authorization: 'Bearer d5510c62f7719c71218b22a0db68c7dded17521d',
+    { Authorization: 'Bearer ' + access_token,
         'Content-Type': 'application/json' },
     };
 
@@ -192,75 +193,69 @@ exports.updateAllCompData = function(compid) {
         let completedweeks = Math.floor(Math.abs(today - startdate) / (1000 * 60 * 60 * 24 * 7));
         let thisweek = completedweeks + 1;
         userjobs = [];
-        for (var i=0; i<competition.Participants.length; i++) 
-        {
-          current_user = competition.Participants[i];
-          console.log('The participant is %s', current_user.AthleteID);
-  
-          // get access_code's
-          var access_token = current_user.StravaAccessCode;
-  
-          // check for existing data
-          userjobs.push(AthleteWeek.find({ AthleteID: current_user.AthleteID}).exec().then((athleteweekdata) => {
-              // TODO Sort by week
-      
-              // TODO check validity of access_token
-              
-              var weekpromises = [];
-              var lastrecordedweek = athleteweekdata.length
-              // missing weeks
-              for (j=athleteweekdata.length+1;j<=completedweeks; j++) {
-                // query strava and add week to db
-              weekpromises.push( 
-                exports.getStravaCompData(access_token, current_user, competition.StartDate, j).then((data) => {
-                  
-                    // add week to athleteweekdata
-                    // upsert
-                    return data.save();
-                  })
-                );
-                lastrecordedweek = j;
-              } // end week for
-              
-              weekpromises.push(exports.getStravaCompData(access_token, current_user, competition.StartDate, thisweek).then((data) => {
-                  
-                  // first update of this week
-                  if (data.WeekNum > lastrecordedweek) {
-                    // add week to db
-                    return data.save();
-                  } else if (data.WeekNum == lastrecordedweek) {
-                    // update week in db
-                    let newdata = { IndoorRides: data.IndoorRides,
-                                    OutdoorRides: data.OutdoorRides,
-                                    TotalDistance: data.TotalDistance
-                                  } 
-                    return AthleteWeek.where({ AthleteID: data.AthleteID, WeekNum: data.WeekNum }).update(newdata).exec();
-  
-                    
-                  }
-              }));
-              return Promise.all(weekpromises)
-            }).then((result) => {
-              console.log("end of participant " + current_user.AthleteID);
-              // Update 
-              return;
-            }).catch((err) => {
-              console.log(err)
-            }));
-        } // end userjobs for
-        return Promise.all(userjobs);
-      }).then((results) => {
-          console.log("End of User Updates");
-          
-          return;
-      }).catch((err) => {
-          console.log("end of update error " + err);
-      });
-  
-  
-  
-  }
 
+        return Promise.map(competition.Participants, function(athlete) {
+            // Promise.map awaits for returned promises as well.
+            console.log('The participant is %s', athlete.AthleteID);
+  
+            return AthleteWeek.find({ AthleteID: athlete.AthleteID}).exec().bind(athlete).then(function(athleteweekdata) {
+                // TODO Sort by week
+        
+                // TODO check validity of access_token
+                var accesscode = this.StravaAccessCode;
+                var user = this;
+                
+                var weekpromises = [];
+                var lastrecordedweek = athleteweekdata.length
+                // missing weeks
+                for (j=athleteweekdata.length+1;j<=completedweeks; j++) {
+                  // query strava and add week to db
+                weekpromises.push( 
+                  exports.getStravaCompData(this.StravaAccessCode, this, competition.StartDate, j).then((data) => {
+                    
+                      // add week to athleteweekdata
+                      // upsert
+                      console.log("saving data for " + data.AthleteName)
+                      return data.save();
+                    })
+                  );
+                  lastrecordedweek = j;
+                } // end week for
+                
+                weekpromises.push(exports.getStravaCompData(this.StravaAccessCode, this, competition.StartDate, thisweek).then((data) => {
+                    
+                    // first update of this week
+                    if (data.WeekNum > lastrecordedweek) {
+                      // add week to db
+                      console.log("saving data for " + data.AthleteName)
+                      return data.save();
+                    } else if (data.WeekNum == lastrecordedweek) {
+                      // update week in db
+                      let newdata = { IndoorRides: data.IndoorRides,
+                                      OutdoorRides: data.OutdoorRides,
+                                      TotalDistance: data.TotalDistance
+                                    } 
+                      console.log("update data for " + data.AthleteName)
+                      return AthleteWeek.where({ AthleteID: data.AthleteID, WeekNum: data.WeekNum }).update(newdata).exec();
+    
+                      
+                    }
+                }));
+                return Promise.all(weekpromises);
+              });
+        }).then(function(athleteweeks) {
+            console.log("done");
+        }).catch(function(err) {
+            console.log("error: " + err);
+        });
+
+     
+            
+      
+  
+  
+  });
+}
   
 
 var onErr = function (err, callback) {

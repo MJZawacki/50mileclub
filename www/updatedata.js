@@ -52,6 +52,6 @@ var log = bunyan.createLogger({
 });
 
 
-dataaccess.updateAllCompData(id).then(() => {
+dataaccess.updateAllCompData(id).then(function() {
   mongoose.connection.close();
 });
